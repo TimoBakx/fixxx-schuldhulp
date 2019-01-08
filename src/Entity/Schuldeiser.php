@@ -89,6 +89,12 @@ class Schuldeiser
      */
     private $opmerkingen;
 
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean", nullable=false, options={"default":"1"})
+     */
+    private $actief;
+
     public function getId()
     {
         return $this->id;
@@ -182,6 +188,22 @@ class Schuldeiser
     public function setOpmerkingen($opmerkingen)
     {
         $this->opmerkingen = $opmerkingen;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActief(): bool
+    {
+        return $this->actief;
+    }
+
+    /**
+     * @param bool $actief
+     */
+    public function setActief(bool $actief): void
+    {
+        $this->actief = $actief;
     }
 
     public function __toString()

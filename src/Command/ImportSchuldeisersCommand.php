@@ -2,13 +2,13 @@
 
 namespace GemeenteAmsterdam\FixxxSchuldhulp\Command;
 
+use Doctrine\ORM\EntityRepository;
+use GemeenteAmsterdam\FixxxSchuldhulp\Entity\Schuldeiser;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use GemeenteAmsterdam\FixxxSchuldhulp\Entity\Schuldeiser;
-use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportSchuldeisersCommand extends ContainerAwareCommand
 {
@@ -21,11 +21,17 @@ class ImportSchuldeisersCommand extends ContainerAwareCommand
         $this->addOption('semicolon', null, InputOption::VALUE_NONE);
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int|null|void
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $delimiter = $input->getOption('semicolon') ? ';' : ',';
 
-        $expectedFields = ['bedrijfsnaam', 'rekening', 'allegroCode', 'straat', 'huisnummer', 'huisnummerToevoeging', 'postcode', 'plaats', 'opmerkingen'];
+        $expectedFields = ['bedrijfsnaam', 'rekening', 'allegroCode', 'straat', 'huisnummer', 'huisnummerToevoeging', 'postcode', 'plaats', 'opmerkingen', 'actief'];
         $fieldList = explode(',', $input->getArgument('fieldList'));
         foreach ($expectedFields as $expectedField) {
             if (in_array($expectedField, $fieldList) === false) {
@@ -36,8 +42,8 @@ class ImportSchuldeisersCommand extends ContainerAwareCommand
 
         $f = fopen($input->getArgument('file'), 'r');
         $i = 0;
-        while($row = fgetcsv($f, null, $delimiter)) {
-            $i ++;
+        while ($row = fgetcsv($f, null, $delimiter)) {
+            $i++;
             $output->writeln('Start line: ' . $i);
             if ($i === 1 && $input->getOption('skipFirstRow')) {
                 $output->writeln('Skip first line');
@@ -65,6 +71,11 @@ class ImportSchuldeisersCommand extends ContainerAwareCommand
         $this->getContainer()->get('doctrine')->getManager()->flush();
     }
 
+    /**
+     * @param $allegroCode
+     *
+     * @return Schuldeiser|mixed
+     */
     private function getOrCreateSchuldeiser($allegroCode)
     {
         /** @var $repo EntityRepository */
@@ -81,6 +92,10 @@ class ImportSchuldeisersCommand extends ContainerAwareCommand
         return reset($result);
     }
 
+    /**
+     * @param             $data
+     * @param Schuldeiser $object
+     */
     private function mapData($data, Schuldeiser $object)
     {
         $object->setAllegroCode($data['allegroCode']);
@@ -92,5 +107,19 @@ class ImportSchuldeisersCommand extends ContainerAwareCommand
         $object->setPostcode($data['postcode']);
         $object->setRekening($data['rekening']);
         $object->setStraat($data['straat']);
+        $object->setActief($this->getActief($data['actief']));
+    }
+
+    /**
+     * @param string $actief
+     *
+     * @return bool
+     */
+    private function getActief(string $actief): bool
+    {
+        if (strtolower($actief) === "nee") {
+            return false;
+        }
+        return true;
     }
 }
