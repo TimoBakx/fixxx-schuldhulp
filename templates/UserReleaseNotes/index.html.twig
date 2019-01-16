@@ -11,7 +11,7 @@
         {% for tmpl in templates %}
             <div class="accordion" data-timestamp="{{ tmpl.id }}"data-decorator="release-note" data-listen-class="accordion-active" data-url="{{ path('gemeenteamsterdam_fixxxschuldhulp_userreleasenotes_releasenoteseen', {'ts': tmpl.id }) }}">
                 <a href="#" class="accordion__header" data-handler="accordion" data-container=".accordion">
-                    {% include 'UserReleaseNotes/' ~ tmpl.title %}
+                    <h2>{% include 'UserReleaseNotes/' ~ tmpl.title %}</h2>
                 </a>
                 <div class="accordion__body">
                     <div class="accordion__content">
