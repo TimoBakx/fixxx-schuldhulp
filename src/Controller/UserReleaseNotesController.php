@@ -31,12 +31,27 @@ class UserReleaseNotesController extends Controller
     public function indexAction(Request $request)
     {
         $finder = new Finder();
-        $finder->files()->in($this->get('kernel')->getRootDir() . '/../templates/UserReleaseNotes/releases');
+        $finder->directories()->in($this->get('kernel')->getRootDir() . '/../templates/UserReleaseNotes/');
 
         $templates = [];
 
-        foreach ($finder as $file) {
-            array_push($templates, $file->getRelativePathname());
+        foreach ($finder as $dir) {
+            $dirPath = $dir->getRealPath();
+            $o = [];
+            $title = new Finder();
+            $content = new Finder();
+            $title->files()->in($dir->getRealPath())->name('title.html.twig');
+            $content->files()->in($dir->getRealPath())->name('content.html.twig');
+            if ($title->hasResults()) {
+                $o['title'] = $dir->getRelativePathname() . '/' . iterator_to_array($title, false)[0]->getRelativePathname();
+            }
+            if ($content->hasResults()) {
+                $o['content'] = $dir->getRelativePathname() . '/' . iterator_to_array($content, false)[0]->getRelativePathname();
+            }
+            if (count($o) == 2) {
+                $o['id'] = $dir->getRelativePathname();
+                $templates[$dir->getRelativePathname()] = $o;
+            }
         }
         return $this->render('UserReleaseNotes/index.html.twig', ['templates' => $templates]);
     }
