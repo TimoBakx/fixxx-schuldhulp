@@ -293,6 +293,28 @@
   };
 
   var decorators = {
+    'img-cover-batch': function(){
+        var self = this,
+          fitType = 'cover',
+          imgElements = self.querySelectorAll('img');
+        if (!('remove' in Element.prototype)) {
+            Element.prototype.remove = function () {
+                if (this.parentNode) {
+                    this.parentNode.removeChild(this);
+                }
+            };
+        }
+        for (var i = 0; i < imgElements.length; i++){
+          var img = imgElements[i],
+            parent = img.parentNode;
+          parent.style.backgroundImage = 'url("' + img.getAttribute('src') + '")';
+          parent.style.backgroundSize = fitType;
+          parent.style.backgroundPosition = 'center center';
+          parent.style.backgroundRepeat = 'no-repeat';
+          parent.style.display = 'block';
+          parent.removeChild(img);
+        }
+    },
     'release-note': function(){
       var self = this,
         onChange = function(e){

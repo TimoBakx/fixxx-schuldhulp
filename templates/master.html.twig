@@ -42,22 +42,24 @@
             <a href="{{ path('gemeenteamsterdam_fixxxschuldhulp_appdossier_index') }}" class="logo">
               <i class="icon-andreas"></i>Gemeente Amsterdam
             </a>
-            <div class="header__title">
-              <strong>{% block page_title %}Schulddossier{% endblock %}</strong>
-              {% if app_version.getEnv == 'dev' or app_version.getEnv == 'acceptance' %}<span>{{ app_version.getEnv }}: {% if app.user %}{{ app.user.userName }} / {{ app.user.getType }} / {% endif %}{{ app_version.getVersionId }}</span>{% endif %}
-            </div>
+            <a href="{{ path('gemeenteamsterdam_fixxxschuldhulp_appdossier_index') }}">
+                <div class="header__title">
+                  <strong>{% block page_title %}Schulddossier{% endblock %}</strong>
+                  {% if app_version.getEnv == 'dev' or app_version.getEnv == 'acceptance' %}<span>{{ app_version.getEnv }}: {% if app.user %}{{ app.user.userName }} / {{ app.user.getType }} / {% endif %}{{ app_version.getVersionId }}</span>{% endif %}
+                </div>
+            </a>
 
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <div class="release-notes__menu">
                     <a href="#" class="release-notes__menu-trigger" data-handler="global-toggle" data-toggle-class="release-notes-menu-active"></a>
                     <span class="release-notes__menu-content">
-                        <p>Bekijk de meest recente aanpassingen aan Schulddosier</p>
-                        <a href="{{ path('gemeenteamsterdam_fixxxschuldhulp_userreleasenotes_index') }}" class="button primary">Release notes</a>
+                        <p>Sinds je laatste inlog is er het een en ander veranderd.</p>
+                        <a href="{{ path('gemeenteamsterdam_fixxxschuldhulp_userreleasenotes_index') }}" class="button primary">Bekijk veranderingen</a>
                     </span>
-                    <span class="release-notes__nieuw">Nieuw</span>
+                    <span class="release-notes__nieuw">Nieuwe versie</span>
                 </div>
               <div class="nav-container">
 
-                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <a href="#MENU" class="nav-open" data-handler="toggle"><i class="icon-menu"></i><span>Menu</span></a>
                 <nav class="nav" id="MENU">
                   <ul class="menu">
@@ -83,7 +85,7 @@
               </div>
         </header>
         
-        <div class="document-container">
+        <div class="{% block documentContainerClass %}document-container{% endblock %}">
 
 {% for type, messages in app.flashes %}
     {% for message in messages %}
