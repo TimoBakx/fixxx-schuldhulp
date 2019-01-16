@@ -1,7 +1,35 @@
 !function (w, d) {
 
   var handlers = {
+      'accordion': function (e) {
+          e && e.preventDefault();
+          var self = this,
+            container = _closest(self, self.dataset.container),
+            transition = 'max-height 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)',
+            stateClass = this.dataset.stateClass || 'accordion-active',
+            active = container.classList.contains(stateClass);
 
+          container.body = container.querySelector('.accordion__body');
+          container.body.style.transition = 'none';
+          container.body.style.maxHeight = 200000 + 'px';
+          var h = container.body.offsetHeight;
+          if (active){
+            container.body.style.maxHeight = h + 'px';
+          }else {
+            container.body.style.maxHeight = '0';
+          }
+          container.classList[active ? 'remove' : 'add'](stateClass);
+          window.clearTimeout(container.timeout);
+          container.timeout = setTimeout(function() {
+            container.body.style.transition = transition;
+            if (active){
+              container.body.style.maxHeight = '0';
+            }else {
+              container.body.style.maxHeight = h + 'px';
+            }
+           }, 10);
+          helpers.trigger(self, 'change');
+      },
     'status-changer': function(e){
       var self = this,
         val = self.dataset.id,
@@ -265,6 +293,28 @@
   };
 
   var decorators = {
+    'release-note': function(){
+      var self = this,
+        onChange = function(e){
+          console.log(_closest(e.target, '.accordion').classList.contains(self.dataset.listenClass));
+          if (_closest(e.target, '.accordion').classList.contains(self.dataset.listenClass)){
+            helpers.ajax({
+              'type': 'get',
+              'url': self.dataset.url
+            })
+          }
+
+
+        },
+        open = self.classList.contains(self.dataset.listenClass || 'accordion-active');
+      // if (self['onChange'] instanceof Array) {
+      //   self['onChange'].push(onChange)
+      // }else {
+      //   self['onChange'] = [onChange];
+      // }
+      self.addEventListener('change', onChange);
+
+    },
     'track-changes': function () {
       var self = this,
         form = _closest(self, 'form'),
@@ -300,6 +350,11 @@
       console.log(radio.value);
       self.dataset.initialData = _getData();
       self.addEventListener('change', _formChange);
+
+    },
+    'accordion': function(){
+      var self = this;
+
 
     },
     'bestand-viewer': function () {

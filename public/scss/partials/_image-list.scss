@@ -1,0 +1,48 @@
+.image-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px -10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+  align-items: center;
+  overflow: visible;
+  > * {
+    margin: 10px;
+  }
+  img {
+    box-shadow: $boxShadowDefault;
+    transition: opacity .3s;
+  }
+  &--coll-2 > li {
+    width: calc((100% / 2) - 20px);
+  }
+  &--coll-3 > li {
+    width: calc((100% / 3) - 20px);
+  }
+  &--coll-4 > li {
+    width: calc((100% / 4) - 20px);
+  }
+  a {
+    display: block;
+  }
+  a:hover {
+    position: relative;
+    background-color: #fff;
+
+    &:before {
+      content: attr(title);
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #000;
+      z-index: 1;
+      text-align: center;
+      font-weight: bold;
+    }
+    img {
+      opacity: .2;
+    }
+  }
+
+}
