@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 
 /**
- * @Route("/app/release-notes")
+ * @Route("/app/versies")
  * @Security("has_role('ROLE_USER')")
  */
 class UserReleaseNotesController extends Controller

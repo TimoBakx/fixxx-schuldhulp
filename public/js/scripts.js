@@ -5,7 +5,7 @@
           e && e.preventDefault();
           var self = this,
             container = _closest(self, self.dataset.container),
-            transition = 'max-height 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)',
+            transition = 'max-height 0.5s cubic-bezier(0.900, 0.000, 0.100, 1.000)',
             stateClass = this.dataset.stateClass || 'accordion-active',
             active = container.classList.contains(stateClass);
 
@@ -315,27 +315,61 @@
           parent.removeChild(img);
         }
     },
-    'release-note': function(){
-      var self = this,
-        onChange = function(e){
-          console.log(_closest(e.target, '.accordion').classList.contains(self.dataset.listenClass));
+    'release-notes': function(){
+      var storageKey = 'release-notes-seen',
+        allNotSeenClass = 'release-notes-not-seen',
+        notseenClass = 'release-note-not-seen',
+        notes = document.querySelectorAll('.release-note'),
+        _checkSeenAll = function(){
+          var allDone = _getStorage()['all'];
+          document.body.classList[!allDone ? 'add' : 'remove'](allNotSeenClass);
+        },
+        _getStorage = function(){
+          if (window.localStorage) {
+            return JSON.parse(window.localStorage.getItem(storageKey) || '{}');
+          }
+        },
+        _addNote = function(note, noteId){
+          if (window.localStorage){
+            var releaseNotesSeen = _getStorage();
+            releaseNotesSeen[noteId] = true;
+            if (Object.keys(releaseNotesSeen).length >= notes.length){
+              releaseNotesSeen['all'] = true;
+            }
+            window.localStorage.setItem('release-notes-seen', JSON.stringify(releaseNotesSeen));
+          }else {
+            console.error('Je browser ondersteunt geen localstorage!');
+          }
+          note && note.classList.remove(notseenClass);
+          _checkSeenAll();
+        },
+        _hasNote = function(noteId){
+          if (window.localStorage){
+            var releaseNotesSeen = JSON.parse(window.localStorage.getItem(storageKey) || '{}');
+            return releaseNotesSeen[noteId];
+          }
+          return false;
+        },
+        _onChange = function(e){
+          var self = this;
           if (_closest(e.target, '.accordion').classList.contains(self.dataset.listenClass)){
             helpers.ajax({
               'type': 'get',
               'url': self.dataset.url
-            })
+            });
+            window.clearTimeout(self.rnTimeout);
+            self.rnTimeout = setTimeout(function(){
+              _addNote(self, self.dataset.releaseNoteId);
+            }, 4000);
+          }else {
+            window.clearTimeout(self.rnTimeout);
           }
-
-
-        },
-        open = self.classList.contains(self.dataset.listenClass || 'accordion-active');
-      // if (self['onChange'] instanceof Array) {
-      //   self['onChange'].push(onChange)
-      // }else {
-      //   self['onChange'] = [onChange];
-      // }
-      self.addEventListener('change', onChange);
-
+        };
+      for (var i = 0; i < notes.length; i++){
+        notes[i].classList[_hasNote(notes[i].dataset.releaseNoteId) ? 'remove' : 'add'](notseenClass);
+        notes[i].addEventListener('change', _onChange);
+      }
+      _checkSeenAll();
     },
     'track-changes': function () {
       var self = this,
