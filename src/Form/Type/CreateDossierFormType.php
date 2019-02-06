@@ -77,3 +77,4 @@ class CreateDossierFormType extends AbstractType
         $resolver->setDefault('choice_translation_domain', false);
     }
 }
+
